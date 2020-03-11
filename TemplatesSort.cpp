@@ -193,17 +193,23 @@ template <typename T> void collectionBubbleSort(T* collection, int size) {
 	}
 }
 
-template <typename T> T collectionGetAvg(T* collection, int size) {
+double toFixed(double num, int sign) {
+	int numOfDigits = pow(10, sign);
+
+	return round(num * numOfDigits) / numOfDigits;
+}
+
+template <typename T> double collectionGetAvg(T* collection, int size) {
 	double sumElems = 0;
 
 	for (int iter = 0; iter < size; iter++) {
 		sumElems = sumElems + collection[iter];
 	}
 
-	return sumElems / size;
+	return toFixed(sumElems / size, 2);
 }
 
-template <typename T> double collectionGetAvg(T* collection, int rows, int cols) {
+template <typename T> double collectionGetAvg(T** collection, int rows, int cols) {
 	double sumElems = 0;
 
 	for (int row = 0; row < rows; row++) {
@@ -215,7 +221,7 @@ template <typename T> double collectionGetAvg(T* collection, int rows, int cols)
 	return sumElems / (rows * cols);
 }
 
-template <typename T> double collectionGetAvg(T* collection, int layers, int rows, int cols) {
+template <typename T> double collectionGetAvg(T*** collection, int layers, int rows, int cols) {
 	double sumElems = 0;
 
 	for (int layer = 0; layer < layers; layer++) {
@@ -227,12 +233,6 @@ template <typename T> double collectionGetAvg(T* collection, int layers, int row
 	}
 
 	return sumElems / (layers * rows * cols);
-}
-
-double toFixed(double num, int sign) {
-	int numOfDigits = pow(10, sign);
-
-	return round(num * numOfDigits) / numOfDigits;
 }
 
 template <typename T> void getRootSquareEquation(T coefA, T coefB) {
@@ -311,6 +311,31 @@ void collectionSortOfRange(int* collection, int size, int firstIndex, int lastIn
 	}
 }
 
+void collectionSortOfRange(int* collection, int size, int firstIndex, int lastIndex, int rev) {
+	switch (rev) {
+		case 0:
+			for (int iter = firstIndex + 1; iter < lastIndex; iter++) {
+				for (int count = iter; count < lastIndex; count++) {
+					if (collection[count] < collection[iter]) {
+						swap(collection[iter], collection[count]);
+					}
+				}
+			}
+
+			break;
+		case 1:
+			for (int iter = firstIndex; iter < lastIndex; iter++) {
+				for (int count = iter; count < lastIndex; count++) {
+					if (collection[iter] < collection[count]) {
+						swap(collection[iter], collection[count]);
+					}
+				}
+			}
+
+			break;
+	}
+}
+
 void collectionSortOfRange() {
 	const int SIZE = 10;
 	int collection[SIZE] { 0 };
@@ -342,6 +367,7 @@ int collectionSearchElem(int* collection, int size, int searchNum) {
 	return -1;
 }
 
+// задача 10
 void task10() {
 	const int SIZE { 10 };
 	int collection[SIZE] { 0 };
@@ -354,9 +380,112 @@ void task10() {
 	std::cout << '\n';
 
 	int searchNum = getRandomNum(0, SIZE - 1);
+	int posSearchNum = collectionSearchElem(collection, SIZE, searchNum);
 	std::cout << "Случайное число: " << searchNum << '\n';
-	std::cout << "Позиция числа: " << collectionSearchElem(collection, SIZE, searchNum);
+	std::cout << "Позиция числа: " << posSearchNum;
+	std::cout << '\n';
 
+	if (posSearchNum != -1) {
+		collectionSortOfRange(collection, SIZE, 0, posSearchNum, 1);
+		collectionSortOfRange(collection, SIZE, posSearchNum, SIZE, 0);
+		collectionShow(collection, SIZE);
+		std::cout << '\n';
+	} else {
+		std::cout << "Загаданного числа нет в массиве.";
+	}
+}
+
+enum Operation : int {
+	show = 1,
+	retake,
+	avg,
+	out
+};
+
+// задача 13
+void academicPerformance() {
+	const int SIZE { 10 };
+	int collection[SIZE];
+
+	for (int iter = 0; iter < SIZE; iter++) {
+		std::cout << "Введите оценку: ";
+		std::cin >> collection[iter];
+	}
+
+	bool isExit = true;
+	int code_operation;
+
+	std::cout << "Меню:\n\t1. Вывести оценки\t2. Пересдать предмет\n\t3. Расчитать средний балл\t4. Выйти\n";
+
+	while (isExit) {
+		std::cout << "Ввести код операции: ";
+		std::cin >> code_operation;
+
+		if (code_operation > 0 && code_operation < 5) {
+			switch (code_operation) {
+				case Operation::show:
+					collectionShow(collection, SIZE);
+					std::cout << '\n';
+					break;
+				case Operation::retake:
+					int
+						index,
+						estimation;
+					std::cout << "Введите номер оценки от 1 до 10 и оценку через пробел: ";
+					std::cin >> index >> estimation;
+
+					if (index - 1 >= 0 && index - 1 < SIZE && estimation > 0 && estimation < 6) {
+						collection[index - 1] = estimation;
+					} else {
+						std::cout << "Неверные данные для изменения оценкию.";
+					}
+
+					break;
+				case Operation::avg:
+					std::cout << "Avg оценок: " << collectionGetAvg(collection, SIZE) << '\n';
+					break;
+				case Operation::out:
+					isExit = false;
+					break;
+			}
+		}
+	}
+
+}
+
+void task14() {
+	const int SIZE { 9 };
+	int collection[SIZE] { 0 };
+
+	collectionInit(collection, SIZE);
+	collectionShow(collection, SIZE);
+	std::cout << '\n';
+	double avg = collectionGetAvg(collection, SIZE);
+	
+	if (avg > 0) {
+		int lastIndex = SIZE - SIZE / 3;
+
+		for (int iter = 0; iter < lastIndex; iter++) {
+			for (int count = iter; count < lastIndex; count++) {
+				if (collection[count] < collection[iter]) {
+					swap(collection[iter], collection[count]);
+				}
+			}
+		}
+	} else {
+		int lastIndex = SIZE / 3;
+
+		for (int iter = 0; iter < lastIndex; iter++) {
+			for (int count = iter; count < lastIndex; count++) {
+				if (collection[count] < collection[iter]) {
+					swap(collection[iter], collection[count]);
+				}
+			}
+		}
+	}
+
+	collectionShow(collection, SIZE);
+	std::cout << '\n';
 }
 
 int main(int argc, char* argv[]) {
@@ -471,10 +600,11 @@ int main(int argc, char* argv[]) {
 
 	//collectionSortOfRange(); // задание 9
 
-	task10();
+	//task10(); // задание 10
 
+	//academicPerformance(); // задача 13
 
-
+	//task14(); // задача 14
 
 	return 0;
 }
