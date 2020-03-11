@@ -39,16 +39,19 @@ template <typename T> void collectionRemove(T* collection) {
 
 template <typename T> void collectionRemove(T** collection, int rows) {
 	for (int row = 0; row < rows; row++) {
-		collectionRemove(collection, row);
 		delete[] collection[row];
 	}
+	delete[] collection;
 }
 
 template <typename T> void collectionRemove(T*** collection, int layers, int rows) {
 	for (int layer = 0; layer < layers; layer++) {
-		collectionRemove(collection[layer], rows);
+		for (int row = 0; row < rows; row++) {
+			delete[] collection[layer][row];
+		}
+		delete[] collection[layer];
 	}
-	delete[] collectionRemove;
+	delete[] collection;
 }
 
 template <typename T> void collectionShow(T* collection, int size) {
@@ -509,6 +512,7 @@ int main(int argc, char* argv[]) {
 
 	collectionInit(collection, layers, rows, cols);
 	collectionShow(collection, layers, rows, cols);
+	collectionRemove(collection, layers, rows);
 	*/
 
 
@@ -554,6 +558,7 @@ int main(int argc, char* argv[]) {
 	collectionInit(collection, rows, cols);
 	collectionShow(collection, rows, cols);
 	std::cout << collectionMaxElem(collection, rows, cols);
+	collectionRemove(collection, rows);
 	*/
 
 	/*
@@ -576,6 +581,7 @@ int main(int argc, char* argv[]) {
 	collectionShow(collection, layers, rows, cols);
 	std::cout << collectionMaxElem(collection, layers, rows, cols);
 	//std::cout << collectionGetAvg(collection, layers, rows, cols); // проверка задания 5
+	collectionRemove(collection, layers, rows);
 	*/
 
 	// задание 7, округление до указанного количества знаков после запятой
